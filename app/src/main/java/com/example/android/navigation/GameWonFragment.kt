@@ -16,10 +16,10 @@
 
 package com.example.android.navigation
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -33,12 +33,44 @@ class GameWonFragment : Fragment() {
         // Inflate the layout for this fragment
         val binding: FragmentGameWonBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_game_won, container, false)
-        var args = arguments?.let { GameWonFragmentArgs.fromBundle(it) }
-        Toast.makeText(context,"Number Qustion:  ${args?.questionNumber} Number Correct ans ${args?.numberCorrect}" ,Toast.LENGTH_LONG).show()
-
-        binding.nextMatchButton.setOnClickListener {view:View->
+        binding.nextMatchButton.setOnClickListener { view: View ->
             Navigation.findNavController(view).navigate(GameWonFragmentDirections.actionGameWonFragmentToGameFragment())
         }
+
+        setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.winner_menu, menu)
+         val menuItem = menu.findItem(R.id.share)
+        if(getShareIntent().resolveActivity(requireActivity().packageManager)==null){
+           //
+            menuItem?.isVisible = false ?:true
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item!!.itemId) {
+            R.id.share -> fireIntent()
+        }
+        return super.onOptionsItemSelected(item)
+
+    }
+
+    fun getShareIntent(): Intent {
+        val args = GameWonFragmentArgs.fromBundle(requireArguments())
+        Toast.makeText(context, "Number Qustion:  ${args?.questionNumber} Number Correct ans ${args?.numberCorrect}", Toast.LENGTH_LONG).show()
+        //create shareIntent
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        //(args?.numberCorrect) means if args not null then get the numberCorrect inside of args
+        shareIntent.setType("text/plain").putExtra(Intent.EXTRA_TEXT,getString(R.string.share_success_text+ args.numberCorrect))
+        return shareIntent;
+    }
+
+
+    fun fireIntent() {
+        startActivity(getShareIntent())
     }
 }

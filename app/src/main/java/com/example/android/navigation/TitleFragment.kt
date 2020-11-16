@@ -20,6 +20,7 @@ class TitleFragment : Fragment() {
         //when click on the button navigate to gameFragment(swap between fragment)
         // So give Navigation control to is  navigate between fragments inside the activity using it's own fragment Host
         // NavHostFragment.
+
         bind.playButton.setOnClickListener{ view:View->
 
             // Set navigation control
